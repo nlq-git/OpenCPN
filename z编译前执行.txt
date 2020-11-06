@@ -1,1 +1,2 @@
-export PATH=:/home/sa/.vscode-server/bin/d2e414d9e4239a252d1ab117bd7067f125afd80a/bin:/home/sa/bin:/home/sa/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+export PATH=:/home/sa/.vscode-server/bin/d2e414d9e4239a252d1ab117bd7067f125afd80a/bin:/home/sa/bin:/home/sa/.local/bin:/home/sa/.vscode-server/bin/d2e414d9e4239a252d1ab117bd7067f125afd80a/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+echo  $PATH
