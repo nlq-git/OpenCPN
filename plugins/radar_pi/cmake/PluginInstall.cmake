@@ -4,9 +4,9 @@
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
 
-##IF(NOT APPLE)
-##  TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${wxWidgets_LIBRARIES} ${EXTRA_LIBS} )
-##ENDIF(NOT APPLE)
+IF(NOT APPLE)
+  TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${wxWidgets_LIBRARIES} ${EXTRA_LIBS} )
+ENDIF(NOT APPLE)
 
 IF(WIN32)
   SET(PARENT "opencpn")
