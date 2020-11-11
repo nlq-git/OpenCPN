@@ -137,6 +137,8 @@ else (APPLE)
   set(PACKAGE_NAME opencpn)
 endif (APPLE)
 
+set(ENV{PATH} "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin")
+
 # Locations where cmake looks for cmake modules.
 set(
   CMAKE_MODULE_PATH
