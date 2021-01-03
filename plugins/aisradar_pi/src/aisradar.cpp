@@ -1811,39 +1811,25 @@ void RadarFrame::ReadDataFromFile(wxCommandEvent &event)
         string filename = path.substr(iPos, path.length() - iPos);
         string name = filename.substr(0, filename.rfind("."));
         newRouteLine->m_NameString = name;
-
-        yellowline = ((name == "1-1") || (name == "1-2") || (name == "1-5") || (name == "1-6") || (name == "2-3") || (name == "2-4") ||
-                      (name == "2-6") || (name == "2-7") || (name == "4-1") || (name == "4-2") || (name == "4-5") || (name == "4-7") || (name == "4-8") ||
-                      (name == "4-9") || (name == "4-10") || (name == "5-1") || (name == "5-2") || (name == "7-1") || (name == "7-2") || (name == "9-1") ||
-                      (name == "9-2") || (name == "9-3") || (name == "9-4") || (name == "10-1") || (name == "11-1") || (name == "11-3"));
-
-        greenline = ((name == "1-3") || (name == "1-7") || (name == "2-1") || (name == "2-2") || (name == "3-1") || (name == "3-2") ||
-                     (name == "3-3") || (name == "3-4") || (name == "3-5") || (name == "3-7") || (name == "4-3") || (name == "5-3") ||
-                     (name == "5-4") || (name == "5-5") || (name == "6-1") || (name == "6-3") || (name == "7-4") || (name == "8-1") || (name == "8-3") ||
-                     (name == "9-6") || (name == "10-2") || (name == "10-3") || (name == "11-4") || (name == "11-6"));
-
-        megentaline = ((name == "gl1-1") || (name == "gl1-2") || (name == "gl2-1") || (name == "gl2-2") || (name == "gl3-1") ||
-                       (name == "gl3-2") || (name == "gl4-1") || (name == "gl4-2") || (name == "gl4-3") || (name == "gl4-4") || (name == "gl4-6") ||
-                       (name == "gl4-7") || (name == "gl4-8") || (name == "gl4-9") || (name == "gl5-1") || (name == "gl5-2") || (name == "gl6-1") || (name == "gl6-2"));
-
-        if (yellowline)
+        string::size_type idx1 = name.find("gl");
+        string::size_type idx2 = name.find("xiao");
+        string::size_type idx3 = name.find("da");
+        if(idx1 != string::npos)
         {
-            AddPlugInRoute2(newRouteLine, "DarkCyan", 3, wxPENSTYLE_LONG_DASH);
+            AddPlugInRoute2(newRouteLine,"DarkRed",1,wxPENSTYLE_SOLID);     //隔离带上色
         }
-        else if (greenline)
+        else if(idx2 != string::npos)
         {
-            AddPlugInRoute2(newRouteLine, "Red", 3, wxPENSTYLE_SOLID);
+            AddPlugInRoute2(newRouteLine,"DarkCyan",6,wxPENSTYLE_LONG_DASH);        //上行航道上色
         }
-        else if (megentaline)
+        else if(idx3 != string::npos)
         {
-
-            AddPlugInRoute2(newRouteLine, "DarkRed", 1, wxPENSTYLE_SOLID);
+            AddPlugInRoute2(newRouteLine,"Red",3,wxPENSTYLE_SOLID);         //下行航道上色
         }
         else
         {
-            AddPlugInRoute2(newRouteLine, "Black", 1, wxPENSTYLE_SOLID);
+            AddPlugInRoute2(newRouteLine,"Black",1,wxPENSTYLE_SOLID);
         }
-
         delete newRouteLine;
     }
     // delete newRouteLine;
