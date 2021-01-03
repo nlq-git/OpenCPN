@@ -1801,30 +1801,34 @@ void RadarFrame::ReadDataFromFile(wxCommandEvent &event)
                 double newLat = lat_1 + lat_2 / 60.0;
                 double newLon = lon_1 + lon_2 / 60.0;
                 PlugIn_Waypoint *newWayPoint = new PlugIn_Waypoint(newLat, newLon, "empty", "Line");
-
                 newRouteLine->pWaypointList->Append(newWayPoint);
             }
         }
         data.close();
-
         string::size_type iPos = path.find_last_of('/') + 1;
         string filename = path.substr(iPos, path.length() - iPos);
         string name = filename.substr(0, filename.rfind("."));
         newRouteLine->m_NameString = name;
-        string::size_type idx1 = name.find("gl");
-        string::size_type idx2 = name.find("xiao");
-        string::size_type idx3 = name.find("da");
+        string::size_type idx1 = name.find("up");
+        string::size_type idx2 = name.find("down");
+        string::size_type idx3 = name.find("area");
+        string::size_type idx4 = name.find("bridge");
+        //"Black"DarkRed"DarkGreen""DarkYellow""DarkBlue""DarkMagenta""DarkCyan""LightGray""DarkGray""Red""Green""Yellow""Blue""Magenta""Cyan")"White")
         if(idx1 != string::npos)
         {
-            AddPlugInRoute2(newRouteLine,"DarkRed",1,wxPENSTYLE_SOLID);     //隔离带上色
+            AddPlugInRoute2(newRouteLine,"Red",3,wxPENSTYLE_SOLID);     //上行航道上色
         }
         else if(idx2 != string::npos)
         {
-            AddPlugInRoute2(newRouteLine,"DarkCyan",6,wxPENSTYLE_LONG_DASH);        //上行航道上色
+            AddPlugInRoute2(newRouteLine,"Green",3,wxPENSTYLE_SOLID);        //下行航道上色
         }
         else if(idx3 != string::npos)
         {
-            AddPlugInRoute2(newRouteLine,"Red",3,wxPENSTYLE_SOLID);         //下行航道上色
+            AddPlugInRoute2(newRouteLine,"DarkRed",5,wxPENSTYLE_SOLID);         //桥区上色
+        }
+        else if(idx3 != string::npos)
+        {
+            AddPlugInRoute2(newRouteLine,"DarkRed",8,wxPENSTYLE_SOLID);         //桥上色
         }
         else
         {
