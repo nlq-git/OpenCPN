@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2021-01-04 16:56:37
+ * @LastEditTime: 2021-01-04 16:56:48
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /OpenCPN-fork/src/1111.cpp
+ */
 /***************************************************************************
  *
  * Project:  OpenCPN
