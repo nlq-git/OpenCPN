@@ -76,6 +76,7 @@ enum    Ids { cbRangeId = 10001,
                 plCanvasId,
 
                 connectOptionLinkId,        // option button
+                runpythonId,                // 运行python button
                 tmTTSId,                    // TTS timer
                 soundPlayId,                // open button
                 // id for socket
@@ -102,9 +103,7 @@ const char * BoundaryAlarmBroadcastContent;
 const char * TurnAlarmBroadcastContent;
 const char * AidDecisionBroadcastContent;
 //zhh0
-
-
-
+FILE *ptrshellpop = NULL;   //打开shell脚本执行python的文件指针
 
 
 double a1 = 6;    //AIS距离标准差
@@ -227,6 +226,7 @@ void executeCMD(const char *cmd, char *result)
     strcpy(ps, cmd);   
     if((ptr=popen(ps, "r"))!=NULL)   
     {   
+        ptrshellpop = ptr;
         while(fgets(buf_ps, 1024, ptr)!=NULL)   
         {   
            strcat(result, buf_ps);   
@@ -234,7 +234,8 @@ void executeCMD(const char *cmd, char *result)
                break;   
         }   
         pclose(ptr);   
-        ptr = NULL;   
+        ptr = NULL;
+        ptrshellpop = ptr;   
     }   
     else  
     {   
@@ -260,6 +261,25 @@ vector<wxString> split(const wxString& str, const wxString& delim) {
  
 	return res;
 }
+vector<string> split1(const string& str, const string& delim) {
+	vector<string> res;
+	if("" == str) return res;
+	//先将要切割的字符串从string类型转换为char*类型
+	char * strs = new char[str.length() + 1] ; //不要忘了
+	strcpy(strs, str.c_str()); 
+ 
+	char * d = new char[delim.length() + 1];
+	strcpy(d, delim.c_str());
+ 
+	char *p = strtok(strs, d);
+	while(p) {
+		string s = p; //分割得到的字符串转换为string类型
+		res.push_back(s); //存入结果数组
+		p = strtok(NULL, d);
+	}
+ 
+	return res;
+}
 
 //---------------------------------------------------------------------------------------
 //          Radar Dialog Implementation
@@ -278,7 +298,8 @@ BEGIN_EVENT_TABLE ( RadarFrame, wxFrame )
     EVT_TIMER    ( tmRefreshId, RadarFrame::OnTimer )
     // EVT_TIMER    ( tmTTSId, RadarFrame::TTSPlaySoundTimer )
     // EVT_BUTTON   ( soundPlayId, RadarFrame::TTSPlaySound )
-     EVT_BUTTON   ( connectOptionLinkId, RadarFrame::ReadDataFromFile )
+    EVT_BUTTON   ( connectOptionLinkId, RadarFrame::ReadDataFromFile )
+    EVT_BUTTON   ( runpythonId, RadarFrame::RunPython )      //待写
     // EVT_SOCKET   ( SOCKET_ID,     RadarFrame::OnSocketEvent) 
     EVT_SOCKET(SERVER_ID,  RadarFrame::OnServerEvent)
     EVT_SOCKET(SOCKET_ID,  RadarFrame::OnSocketEvent)
@@ -355,6 +376,7 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
 	// Columns
 	ShipInfo->EnableDragColMove( false );
 	ShipInfo->EnableDragColSize( true );
+    
 	//ShipInfo->SetColLabelSize( 100 );
 	ShipInfo->SetColLabelAlignment( wxALIGN_CENTER, wxALIGN_CENTER );
     ShipInfo->SetColSize(0,150);
@@ -370,6 +392,7 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
 	ShipInfo->EnableDragRowSize( true );
 	ShipInfo->SetRowLabelSize( 150);
 	ShipInfo->SetRowLabelAlignment( wxALIGN_CENTER, wxALIGN_CENTER );
+    
     
   
    
@@ -391,9 +414,13 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
      OwnShipDesion->SetColLabelValue(0,wxT("预警与辅助决策"));
     
      OwnShipDesion->SetColSize(0,450);
+     //OwnShipDesion->AutoSizeColumns(true);
+     //OwnShipDesion->SetDefaultColSize (450, false);
+     
 
      OwnShipDesion->EnableDragRowSize( true );
 	 OwnShipDesion->SetRowLabelSize( 150);
+	 
 	 OwnShipDesion->SetRowLabelAlignment( wxALIGN_CENTER, wxALIGN_CENTER );
      OwnShipDesion->SetRowLabelValue(0,wxT("偏航报警"));
      OwnShipDesion->SetRowLabelValue(1,wxT("边界报警"));
@@ -462,7 +489,9 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
     m_ConnectOptionButton = new wxButton( panel, connectOptionLinkId, wxT("添加航道"), wxPoint( -1,-1 ), wxDefaultSize, 0 );
     m_buttonBox->Add( m_ConnectOptionButton, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5 );
     m_soundButton = new wxButton( panel, soundPlayId, wxT("Open"), wxPoint( -1,-1 ), wxDefaultSize, 0 );
-    m_buttonBox->Add( m_soundButton, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5  );
+    //m_buttonBox->Add( m_soundButton, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5  );
+    m_RunPython = new wxButton( panel, runpythonId, wxT("运行/暂停"), wxPoint( -1,-1 ), wxDefaultSize, 0 );
+    m_buttonBox->Add( m_RunPython, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5  );
     m_soundButton->Disable();
     sbSizer1->Add( m_buttonBox, 0, wxALIGN_CENTER, 5 );
     
@@ -528,6 +557,7 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
 #endif // wxUSE_STATUSBAR
 
     UpdateStatusBar();
+    //调用python
 
     return true;
 }
@@ -634,6 +664,10 @@ void RadarFrame::paintEvent(wxPaintEvent & event) {
     wxAutoBufferedPaintDC   dc(m_pCanvas);
     render(dc);
     event.Skip();
+}
+void RadarFrame::paintrouteline()
+{
+   
 }
 #if 0 // Client
 /**
@@ -913,9 +947,15 @@ void RadarFrame::OnSocketEvent(wxSocketEvent& event)
         case wxSOCKET_LOST  : s.Append(_("wxSOCKET_LOST\n")); break;
         default             : s.Append(_("Unexpected event !\n")); break;
     }
-
     m_textCtrl1->AppendText(s);
-
+    if(RunPythonSymbol >= 2)
+    {
+        m_numClients--;
+        s.Append(_("wxSOCKET_LOST\n"));
+        m_textCtrl1->AppendText(s);
+        RunPythonSymbol = 0;
+        sock->Destroy();
+    }
     // Now we process the event
     switch(event.GetSocketEvent())
     {
@@ -1768,9 +1808,10 @@ void RadarFrame::renderRange(wxDC& dc, wxPoint &center, wxSize &size, int radius
     //     dc.DrawText(wxString::Format(_T("%3.1d\u00B0"),(int)(m_Ebl+offset)%360),tx,ty);
     // }
 }
+
+#if 1
 void RadarFrame::ReadDataFromFile(wxCommandEvent &event)
 {
-    bool yellowline, greenline, megentaline;
     ifstream data;
     wxArrayString allpaths;
     string path;
@@ -1831,4 +1872,55 @@ void RadarFrame::ReadDataFromFile(wxCommandEvent &event)
         delete newRouteLine;
     }
     // delete newRouteLine;
+}
+#endif // 0
+
+void RadarFrame::RunPython(wxCommandEvent &even4t)
+{
+    if(RunPythonSymbol)
+    {
+        if(ptrshellpop != NULL)
+        {
+        /* pclose(ptrshellpop);
+        ptrshellpop = NULL; */
+        wxString msg;
+        msg.Printf(wxT("是否暂停"));
+        int choice;
+        choice = wxMessageBox(msg, wxT(""),
+                 wxYES_NO | wxICON_INFORMATION, this);
+        switch (choice)
+			{
+			case 2:
+				RunPythonSymbol++;
+				break;
+			case 8:
+				break;
+			default:
+				break;
+			}        
+        }
+        
+    }
+    else
+    {
+        const char* Username_buffer = username();
+        char buff[1024];
+        char result[1024];
+        snprintf(buff, sizeof( buff ), "sh /home/%s/Project/sujiaoke/myshell.sh",Username_buffer);
+        //snprintf(buff, sizeof( buff ), "python3 /home/%s/Project/sujiaoke/苏交科项目3.0/main_example_connect.py",Username_buffer);
+        //executeCMD(buff, result);
+        //system(buff);
+        std::thread t(executeCMD, buff, result);
+        //std::thread t(system, buff);
+        t.detach();
+        wxString msg;
+        msg.Printf(wxT("算法运行"));
+        wxMessageBox(msg, wxT(""),
+                    wxOK | wxICON_INFORMATION, this);
+        if(ptrshellpop != NULL)
+        {
+        RunPythonSymbol++;    
+        }
+            
+    }
 }

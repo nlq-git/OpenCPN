@@ -22,7 +22,7 @@
                 "isDefault": true
             },
             "type": "shell",
-            "command": "make",
+            "command": "make -j10",
             "args": [],
             "problemMatcher": []
         }

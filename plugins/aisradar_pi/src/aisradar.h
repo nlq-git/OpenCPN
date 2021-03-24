@@ -114,6 +114,7 @@ public:
     void OnLeftMouse( const wxPoint &curpos );
     void paintEvent( wxPaintEvent& event );
     void OwnShipDecisionBroadcast(void);
+    void paintrouteline();
 
 //zhh0
     wxString YawAlarm;
@@ -173,12 +174,14 @@ private:
     wxTextCtrl             *m_textCtrl1;
     wxButton               *m_soundButton;
     wxButton               *m_ConnectOptionButton;
+    wxButton               *m_RunPython;
 
     // TCP socket
     // wxSocketClient         *m_sock;
     wxSocketServer         *m_server;
     int                     m_numClients;
     bool                    m_busy;
+    int                    RunPythonSymbol = 0;
 
     void OnServerEvent(wxSocketEvent& event);
     void OnSocketEvent(wxSocketEvent& event);
@@ -193,6 +196,7 @@ private:
     void Test3(wxSocketBase *sock);
 
     void ReadDataFromFile(wxCommandEvent& event);//nlq 
+    void RunPython(wxCommandEvent& event);   //nlq
     // kalman
     //FusionEKF               fusionEKF;
     
