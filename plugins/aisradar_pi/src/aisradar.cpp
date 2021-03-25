@@ -948,8 +948,11 @@ void RadarFrame::OnSocketEvent(wxSocketEvent& event)
         default             : s.Append(_("Unexpected event !\n")); break;
     }
     m_textCtrl1->AppendText(s);
+    //按钮触发中断socket
     if(RunPythonSymbol >= 2)
     {
+        //先暂停接收
+        sock->SetNotify(wxSOCKET_LOST_FLAG);
         m_numClients--;
         s.Append(_("wxSOCKET_LOST\n"));
         m_textCtrl1->AppendText(s);
