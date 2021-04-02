@@ -1982,7 +1982,7 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
         char buf_cwd[1024] = {0};
         getcwd(buf_cwd, sizeof(buf_cwd));
         string tmep = buf_cwd;
-        string shell = "sh " + tmep + "/myshell.sh";
+        string shell = "sh " + tmep + "/苏交科项目3.0/myshell.sh";
         char shell_char[1024] = {0};
         strcpy(shell_char,shell.c_str());
         snprintf(buff, sizeof( buff ),shell_char,Username_buffer);
