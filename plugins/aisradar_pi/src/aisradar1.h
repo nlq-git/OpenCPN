@@ -34,9 +34,15 @@
 #include "wx/dcbuffer.h"
 #include <wx/grid.h>
 #include "Target.h"
+#include "ShipStatus.h"
+
+#include <unistd.h>
 
 #include <fstream>       //提供文件头文件
-
+#include <thread>
+#include <mutex>
+#include <unordered_map>
+#include <vector>
 
 #ifndef  WX_PRECOMP
   #include "wx/wx.h"
@@ -53,6 +59,9 @@
 #else
     #define   MyFit(a)    FitInside(a)
 #endif
+
+using namespace std;
+long long getCurrentTime();
 
 class aisradar_pi;
 // class FusionEKF;
@@ -183,8 +192,12 @@ private:
     bool                    m_busy;
     int                    RunPythonSymbol = 0;
 
+    ShipStatus             *m_ShipStatus;
+
     void OnServerEvent(wxSocketEvent& event);
     void OnSocketEvent(wxSocketEvent& event);
+    void RecvMessageFromClient(wxSocketBase *sock, wxString &data_from_client, wxString HEAD);
+    bool ParseReceiveData(wxString data);
     void UpdateStatusBar();
 
     

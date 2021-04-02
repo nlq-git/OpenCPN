@@ -34,6 +34,9 @@ SET(SRC_AISRADAR
       src/Canvas.cpp
       src/Target.h
       src/Target.cpp
+      # src/ShipStatus.h
+      # src/ShipStatus.cpp
+      # src/ShowShipStatus.cpp
       # src/FusionEKF.cpp
       # src/kalman/kalman_filter.cpp
       # src/kalman/main.cpp
