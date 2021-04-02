@@ -949,7 +949,7 @@ void RadarFrame::OnSocketEvent(wxSocketEvent& event)
     }
     m_textCtrl1->AppendText(s);
     //按钮触发中断socket
-    if(RunPythonSymbol >= 2)
+    if(RunPythonSymbol = 2)
     {
         //先暂停接收
         sock->SetNotify(wxSOCKET_LOST_FLAG);
@@ -1979,7 +1979,13 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
         const char* Username_buffer = username();
         char buff[1024];
         char result[1024];
-        snprintf(buff, sizeof( buff ), "sh /home/%s/Project/sujiaoke/myshell.sh",Username_buffer);
+        char buf_cwd[1024] = {0};
+        getcwd(buf_cwd, sizeof(buf_cwd));
+        string tmep = buf_cwd;
+        string shell = "sh " + tmep + "/myshell.sh";
+        char shell_char[1024] = {0};
+        strcpy(shell_char,shell.c_str());
+        snprintf(buff, sizeof( buff ),shell_char,Username_buffer);
         //snprintf(buff, sizeof( buff ), "python3 /home/%s/Project/sujiaoke/苏交科项目3.0/main_example_connect.py",Username_buffer);
         //executeCMD(buff, result);
         //system(buff);
