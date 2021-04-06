@@ -488,11 +488,11 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
     
     m_ConnectOptionButton = new wxButton( panel, connectOptionLinkId, wxT("添加航道"), wxPoint( -1,-1 ), wxDefaultSize, 0 );
     m_buttonBox->Add( m_ConnectOptionButton, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5 );
-    m_soundButton = new wxButton( panel, soundPlayId, wxT("Open"), wxPoint( -1,-1 ), wxDefaultSize, 0 );
+    //m_soundButton = new wxButton( panel, soundPlayId, wxT("Open"), wxPoint( -1,-1 ), wxDefaultSize, 0 );
     //m_buttonBox->Add( m_soundButton, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5  );
     m_RunPython = new wxButton( panel, runpythonId, wxT("运行/暂停"), wxPoint( -1,-1 ), wxDefaultSize, 0 );
     m_buttonBox->Add( m_RunPython, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5  );
-    m_soundButton->Disable();
+    //m_soundButton->Disable();
     sbSizer1->Add( m_buttonBox, 0, wxALIGN_CENTER, 5 );
     
     vbox->Add(sbSizer1, 0, wxEXPAND | wxALL, 5);
@@ -949,14 +949,14 @@ void RadarFrame::OnSocketEvent(wxSocketEvent& event)
     }
     m_textCtrl1->AppendText(s);
     //按钮触发中断socket
-    if(RunPythonSymbol = 2)
+    if(StopSocket)
     {
         //先暂停接收
         sock->SetNotify(wxSOCKET_LOST_FLAG);
         m_numClients--;
         s.Append(_("wxSOCKET_LOST\n"));
         m_textCtrl1->AppendText(s);
-        RunPythonSymbol = 0;
+        StopSocket = false;
         sock->Destroy();
     }
     // Now we process the event
@@ -1161,7 +1161,7 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
             int j;
             int otherships = 0;
             // TODO:改成表格显示
-            if(res[0]!="qt" && res[0]!="jc"  && res[0]!="zc") return;
+            if(res[0]!="qt" && res[0]!="jh"  && res[0]!="zc") return;
 
             // CilentResultSignalZero();
 
@@ -1954,8 +1954,6 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
     {
         if(ptrshellpop != NULL)
         {
-        /* pclose(ptrshellpop);
-        ptrshellpop = NULL; */
         wxString msg;
         msg.Printf(wxT("是否暂停"));
         int choice;
@@ -1964,7 +1962,8 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
         switch (choice)
 			{
 			case 2:
-				RunPythonSymbol++;
+				StopSocket = true;
+                RunPythonSymbol = false;
 				break;
 			case 8:
 				break;
@@ -1976,7 +1975,7 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
     }
     else
     {
-        const char* Username_buffer = username();
+        //const char* Username_buffer = username();
         char buff[1024];
         char result[1024];
         char buf_cwd[1024] = {0};
@@ -1985,11 +1984,11 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
         string shell = "sh " + tmep + "/../苏交科项目/myshell.sh";
         char shell_char[1024] = {0};
         strcpy(shell_char,shell.c_str());
-        snprintf(buff, sizeof( buff ),shell_char,Username_buffer);
+        //snprintf(buff, sizeof( buff ),shell_char);
         //snprintf(buff, sizeof( buff ), "python3 /home/%s/Project/sujiaoke/苏交科项目3.0/main_example_connect.py",Username_buffer);
         //executeCMD(buff, result);
         //system(buff);
-        std::thread t(executeCMD, buff, result);
+        std::thread t(executeCMD, shell_char, result);
         //std::thread t(system, buff);
         t.detach();
         wxString msg;
@@ -1998,8 +1997,8 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
                     wxOK | wxICON_INFORMATION, this);
         if(ptrshellpop != NULL)
         {
-        RunPythonSymbol++;    
+        RunPythonSymbol = true;      
         }
-            
+        
     }
 }

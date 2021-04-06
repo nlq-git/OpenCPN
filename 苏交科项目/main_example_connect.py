@@ -70,7 +70,7 @@ def send_data(sock, data):
     sock.send(byte_data)
     sock.sendall(data.encode())
     t2=time.time()-t1
-    print("####################发送数据",data,"###################耗时：",t2)
+    # print("####################发送数据",data,"###################耗时：",t2)
     resv_len = sock.recv(4)
     num = int.from_bytes(resv_len, "little")
     # data_resv = sock.recv(num).decode()
@@ -7118,7 +7118,7 @@ class Get_Support_Decision():
         channel_ownShip=self.judge_ownShip_channel() #本船所处航段
         mark_channel=channel_ownShip[4][3] #上行/下行
         status=self.identify_situation(mark_channel) #局面
-        print("局面",status)
+        # print("局面",status)
         section_course=self.get_section_condition(channel_ownShip) #[c_left,c_right]
         #print("改向角",section_course)
 
@@ -7288,8 +7288,8 @@ while True:
     data_recv = get_data(sockfd)  # 调用def get_data()方法获取船舶数据
     list_ownship = data_recv[0]  # 本船信息 [经度，纬度，航向,速度,船长，船宽]
     list_ships_resv = data_recv[1]  # 他船信息 [[经度，纬度，航向,mmsi，速度],[经度，纬度，航向,mmsi，速度]]
-    print("本船信息：",list_ownship)
-    print("其他船舶信息：",list_ships_resv)
+    # print("本船信息：",list_ownship)
+    # print("其他船舶信息：",list_ships_resv)
 
     shipsData_conveted = Convert_Data([[], []]).convert_shipsData(list_ownship, list_ships_resv)  # 转换船舶信息的坐标
     ownshipData_converted = shipsData_conveted[0]  # 坐标转换后的本船信息
@@ -7594,12 +7594,12 @@ while True:
             ###2、获取危险船舶########
             list_danger_ships = Warm_Danger_By_SOM(ownshipData_converted, list_targetships
                                                    ).start()  # [船舶1,船舶2,船舶3.......] ，船舶：[x，y，航向,mmsi，速度,t_in]
-            print("VO", list_danger_ships)
+            # print("VO", list_danger_ships)
 
             ###3、获取最危险船舶########
             list_most_danger_ship = Get_Most_Danger_Ship(ownshipData_converted, list_targetships,
                                                          list_channel_messege).start(1800)
-            print("最危险", list_most_danger_ship)
+            # print("最危险", list_most_danger_ship)
 
             if list_most_danger_ship[0][0] == 0:  # 无危险船舶
                 warm_decision = ["D", "D"]

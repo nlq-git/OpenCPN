@@ -181,7 +181,8 @@ private:
     wxSocketServer         *m_server;
     int                     m_numClients;
     bool                    m_busy;
-    int                    RunPythonSymbol = 0;
+    bool                    RunPythonSymbol = false;
+    bool                    StopSocket = false;
 
     void OnServerEvent(wxSocketEvent& event);
     void OnSocketEvent(wxSocketEvent& event);
