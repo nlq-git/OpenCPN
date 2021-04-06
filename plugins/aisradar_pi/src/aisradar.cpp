@@ -1070,16 +1070,15 @@ void RadarFrame::SendData2Client(wxSocketBase *sock)
     sock->Write(buf, bufflen);
 }
 
-//zhh2
 void RadarFrame::OwnShipDecisionBroadcast(void){
      
 //version1 全部播报，如果数据变化较多，播报会来不及出现语音混杂情况
-    // if(YawAlarmBroadcastContent != "0"){
-    //     do_play_wav(YawAlarmBroadcastContent);
-    // }
-    // if(BoundaryAlarmBroadcastContent != "0"){
-    //     do_play_wav(BoundaryAlarmBroadcastContent);
-    // }
+    if(YawAlarmBroadcastContent != "0"){
+        do_play_wav(YawAlarmBroadcastContent);
+    }
+    if(BoundaryAlarmBroadcastContent != "0"){
+        do_play_wav(BoundaryAlarmBroadcastContent);
+    }
     // if(TurnAlarmBroadcastContent != "0"){
     //     do_play_wav(TurnAlarmBroadcastContent);
     // }
@@ -1087,24 +1086,23 @@ void RadarFrame::OwnShipDecisionBroadcast(void){
     //     do_play_wav(AidDecisionBroadcastContent);
     // }
  //version2 辅助决策暂时不播，其他三项优先级-转向点>边界>偏航   
-    if(TurnAlarmBroadcastContent != "0"){
-        do_play_wav(TurnAlarmBroadcastContent);
-    }
-    else {
-        if(BoundaryAlarmBroadcastContent != "0"){
-            do_play_wav(BoundaryAlarmBroadcastContent);
-        }
-        else{
-            if(YawAlarmBroadcastContent != "0"){
-                do_play_wav(YawAlarmBroadcastContent);
-            }
-        }
-    }
+    // if(TurnAlarmBroadcastContent != "0"){
+    //     do_play_wav(TurnAlarmBroadcastContent);
+    // }
+    // else {
+    //     if(BoundaryAlarmBroadcastContent != "0"){
+    //         do_play_wav(BoundaryAlarmBroadcastContent);
+    //     }
+    //     else{
+    //         if(YawAlarmBroadcastContent != "0"){
+    //             do_play_wav(YawAlarmBroadcastContent);
+    //         }
+    //     }
+    // }
 
 
 
 }
-
 
 //zhh3
 void RadarFrame::GetClientResult(wxSocketBase *sock)
@@ -1112,7 +1110,7 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
     TestLogger logtest("GetClientResult");
    
 
-    // Read the message
+    // Read the message 
     unsigned int len;
     sock->Read(&len, 4);
     // unsigned char len;
@@ -1161,11 +1159,11 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
             int j;
             int otherships = 0;
             // TODO:改成表格显示
-            if(res[0]!="qt" && res[0]!="jh"  && res[0]!="zc") return;
+            //if(res[0]!="qt" && res[0]!="jh"  && res[0]!="zc") return;
 
             // CilentResultSignalZero();
 
-            if(res[1]!="out" && res[1]!="not"  && res[1]!="in") return;
+           //if(res[1]!="out" && res[1]!="not"  && res[1]!="in") return;
 
             if(res[1] == "out" && (res[0]=="jh"|| res[0]=="zc"))
                  OwnShipDesion->SetCellValue(0, 0, wxT("请驶入推荐航道"));
@@ -1347,7 +1345,7 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
                 OwnShipDesion->SetCellValue(1, 0, BoundaryAlarm);
                 i++;
 
-                if(res[i]=="zc"){
+                if(res[0]=="zc"){
                     //转向报警
                     char TurnAlarmBuff[1024];
                     if(res[i]=="N"){
@@ -1445,10 +1443,10 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
                         AidDecisionMaking.append(wxT("保速"));
 
                     else if(res[i]=="D")
-                        AidDecisionMaking.append(wxT("正常行驶"));
+                        AidDecisionMaking.append(wxT(""));
 
                     else if(res[i]=="N")
-                        AidDecisionMaking.append(wxT("危险，请注意避让"));
+                        AidDecisionMaking.append(wxT(""));
             
                 
                     else{}
@@ -1598,7 +1596,6 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
     sock->Write(buff, bufflen);
     
 }
-
 
 void RadarFrame::Test3(wxSocketBase *sock)
 {
