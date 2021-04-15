@@ -4,7 +4,7 @@
 #pwd
 filepath=$(cd "$(dirname "$0")"; pwd)"/main_example_connect.py \r"
 echo $filepath
-~/anaconda3/envs/tfgpu/bin/python $filepath
+python3 $filepath
 
 echo "执行完毕"
 exit 0
