@@ -1922,7 +1922,7 @@ void RadarFrame::ReadDataFromFile(wxCommandEvent &event)
         newRouteLine->m_NameString = name;
         string::size_type idx1 = name.find("gl");
         string::size_type idx2 = name.find("xiao");
-        string::size_type idx3 = name.find("up");
+        string::size_type idx3 = name.find("da");
         if(idx1 != string::npos)
         {
             AddPlugInRoute2(newRouteLine,"DarkRed",4,wxPENSTYLE_SOLID);     //隔离带上色
@@ -1995,7 +1995,6 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
         if(ptrshellpop != NULL)
         {
         RunPythonSymbol = true;      
-        }
-        
+        }  
     }
 }

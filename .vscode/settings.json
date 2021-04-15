@@ -65,6 +65,5 @@
         "condition_variable": "cpp",
         "*.cuh": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Enabled",
-    "python.pythonPath": "/usr/bin/python"
+    "C_Cpp.errorSquiggles": "Enabled"
 }
