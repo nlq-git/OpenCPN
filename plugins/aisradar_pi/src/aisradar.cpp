@@ -103,7 +103,7 @@ const char * BoundaryAlarmBroadcastContent;
 const char * TurnAlarmBroadcastContent;
 const char * AidDecisionBroadcastContent;
 //zhh0
-FILE *ptrshellpop = NULL;   //打开shell脚本执行python的文件指针
+//FILE *ptrshellpop = NULL;   //打开shell脚本执行python的文件指针
 
 
 double a1 = 6;    //AIS距离标准差
@@ -226,7 +226,6 @@ void executeCMD(const char *cmd, char *result)
     strcpy(ps, cmd);   
     if((ptr=popen(ps, "r"))!=NULL)   
     {   
-        ptrshellpop = ptr;
         while(fgets(buf_ps, 1024, ptr)!=NULL)   
         {   
            strcat(result, buf_ps);   
@@ -234,8 +233,7 @@ void executeCMD(const char *cmd, char *result)
                break;   
         }   
         pclose(ptr);   
-        ptr = NULL;
-        ptrshellpop = ptr;   
+        ptr = NULL;     
     }   
     else  
     {   
@@ -557,8 +555,6 @@ bool RadarFrame::Create ( wxWindow *parent, aisradar_pi *ppi, wxWindowID id,
 #endif // wxUSE_STATUSBAR
 
     UpdateStatusBar();
-    //调用python
-
     return true;
 }
 
@@ -577,7 +573,11 @@ void RadarFrame::OnClose ( wxCloseEvent& event ) {
     delete m_Timer;
     delete m_Timer_TTS;
     // delete m_sock;
-    
+    if(OnSocketEvent_sock)
+    {
+        OnSocketEvent_sock->Destroy();
+    }
+    delete m_server;
     // Save window size
     pPlugIn->SetRadarFrameX(m_pViewState->GetPos().x);
     pPlugIn->SetRadarFrameY(m_pViewState->GetPos().y);
@@ -933,13 +933,14 @@ void RadarFrame::OnServerEvent(wxSocketEvent& event)
 
     m_numClients++;
     UpdateStatusBar();
+    RunPythonSymbol = true;
 }
 
 void RadarFrame::OnSocketEvent(wxSocketEvent& event)
 {
     wxString s = _("OnSocketEvent: ");
     wxSocketBase *sock = event.GetSocket();
-
+    OnSocketEvent_sock = sock;
     // First, print a message
     switch(event.GetSocketEvent())
     {
@@ -957,6 +958,7 @@ void RadarFrame::OnSocketEvent(wxSocketEvent& event)
         s.Append(_("wxSOCKET_LOST\n"));
         m_textCtrl1->AppendText(s);
         StopSocket = false;
+        OnSocketEvent_sock = nullptr;
         sock->Destroy();
     }
     // Now we process the event
@@ -1130,7 +1132,10 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
             // "2-10-2-R-M-L
             std::vector<wxString> res = split(sock_buffer, wxT("-"));
             // int i = 1; wxString s;
+            if (res.size() > 2){
+
             
+
             
             
             // if (res[0] != "0"){
@@ -1586,7 +1591,7 @@ void RadarFrame::GetClientResult(wxSocketBase *sock)
     }
 
     
-    
+    }
     wxString s = "Something wrong!";
     unsigned int bufflen = s.size();
     wxCharBuffer buff(bufflen);
@@ -1949,7 +1954,7 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
 {
     if(RunPythonSymbol)
     {
-        if(ptrshellpop != NULL)
+        if(m_numClients)
         {
         wxString msg;
         msg.Printf(wxT("是否暂停"));
@@ -1989,12 +1994,10 @@ void RadarFrame::RunPython(wxCommandEvent &even4t)
         //std::thread t(system, buff);
         t.detach();
         wxString msg;
-        msg.Printf(wxT("算法运行"));
-        wxMessageBox(msg, wxT(""),
-                    wxOK | wxICON_INFORMATION, this);
-        if(ptrshellpop != NULL)
-        {
-        RunPythonSymbol = true;      
-        }  
+        wxMessageBox(msg, wxT("算法运行"), wxOK, this);
+        // if(m_numClients)
+        // {
+        // RunPythonSymbol = true;      
+        // }  
     }
 }

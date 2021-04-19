@@ -179,6 +179,7 @@ private:
     // TCP socket
     // wxSocketClient         *m_sock;
     wxSocketServer         *m_server;
+    wxSocketBase           *OnSocketEvent_sock = nullptr;
     int                     m_numClients;
     bool                    m_busy;
     bool                    RunPythonSymbol = false;
